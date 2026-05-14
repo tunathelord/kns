@@ -1,15 +1,22 @@
 <!doctype html>
 <html lang="vi">
 <head>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kho PTG">
+
+<script>
+  // Đăng ký Service Worker để chạy offline
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kho Nông Sản PTG</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Kho PTG">
-</head>
+<link rel="stylesheet" href="style.css">
+    </head>
 <body>
 
 <div class="tuna-app-wrapper">
@@ -18,8 +25,8 @@
             <div class="header-wrap">
                 <h1 class="header-title">KHO NÔNG SẢN PTG</h1>
                 <a href="https://www.tiktok.com/@tunasama.206" target="_blank" class="btn-follow-dev">🔗 THEO DÕI / BÁO LỖI</a>
-                <button class="btn-header-icon" onclick="openAccModal()"> 👥 </button>
-                <button class="btn-header-icon" onclick="openFilterModal()"> 🔍 </button>
+                <button class="btn-header-icon" title="Quản lý tài khoản" onclick="openAccModal()"> 👥 </button>
+                <button class="btn-header-icon" title="Bộ lọc tìm kiếm" onclick="openFilterModal()"> 🔍 </button>
             </div>
             <div class="total-display"><span>TỔNG GIÁ TRỊ KHO ƯỚC TÍNH</span><strong id="inv-total">0 xu</strong></div>
             <div class="grid-container" id="inv-grid"></div>
@@ -32,7 +39,7 @@
                 <h2 id="sub-title" style="margin: 0 0 0 15px; color: var(--primary-nau); font-size: 22px;"></h2>
             </div>
             <div id="sub-list" style="flex: 1; padding-bottom: 80px;"></div>
-            <button class="bottom-calc-btn fab-btn" onclick="openAddStockModal()"> ＋ </button>
+            <button class="bottom-calc-btn" style="right: 20px; left: auto; transform: none; width: 60px; height: 60px; border-radius: 50%; background: var(--btn-blue); box-shadow: 0 6px 0 #3B82F6; font-size: 26px;" onclick="openAddStockModal()"> ＋ </button>
         </div>
         
         <div id="filter-result-view" class="view-section">
@@ -40,101 +47,110 @@
                 <button class="btn-back-3d" onclick="closeFilterResultView()"> ⬅ </button>
                 <h2 style="margin: 0 0 0 15px; color: var(--primary-nau); font-size: 22px;">KẾT QUẢ LỌC</h2>
             </div>
-            <div class="filter-count-badge"> Đã tìm thấy: <span id="filter-count">0</span> mục </div>
+            <div style="background: white; padding: 12px; border-radius: 15px; text-align: center; font-weight: 700; color: var(--primary-nau); margin-bottom: 12px; box-shadow: 0 4px 0 #E0E0E0; font-size: 14px;">
+                Đã tìm thấy: <span id="filter-count" style="color: #F3A536; font-size: 18px; font-weight: 800;">0</span> mục
+            </div>
             <div id="filter-list" style="flex: 1; padding-bottom: 80px;"></div>
         </div>
     </div>
 </div>
 
 <div class="overlay" id="modal-acc">
-    <div class="modal-box acc-modal-border">
+    <div class="modal-box" style="border: 4px solid #EADDCB;">
         <span class="close-btn" onclick="closeAccModal()">×</span>
-        <h3 class="modal-title">QUẢN LÝ TÀI KHOẢN <span class="btn-help-inline" onclick="showHelp('acc')">?</span></h3>
+        <h3 style="text-align: center; color: var(--primary-nau); margin-top: 0; font-size: 20px;">
+            QUẢN LÝ TÀI KHOẢN <span class="btn-help-inline" onclick="showHelp('acc')">?</span>
+        </h3>
         
-        <div class="backup-group">
-            <button onclick="exportData()" class="btn-action btn-export">XUẤT DỮ LIỆU</button>
-            <button onclick="document.getElementById('fileInput').click()" class="btn-action btn-import">NHẬP DỮ LIỆU</button>
+        <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+            <button onclick="exportData()" class="btn-action" style="flex:1; margin:0; background: #4CAF50; box-shadow:0 4px 0 #388E3C; font-size: 11px;">XUẤT DỮ LIỆU</button>
+            <button onclick="document.getElementById('fileInput').click()" class="btn-action" style="flex:1; margin:0; background: #FF9800; box-shadow:0 4px 0 #F57C00; font-size: 11px;">NHẬP DỮ LIỆU</button>
             <input type="file" id="fileInput" style="display:none" accept=".json" onchange="importData(event)">
         </div>
 
-        <div class="input-inline-group">
-            <input type="text" id="new-acc-name" placeholder="Tên tài khoản mới...">
-            <button class="btn-action btn-add" onclick="addAccount()">THÊM</button>
+        <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+            <input type="text" id="new-acc-name" placeholder="Nhập tên tài khoản mới..." style="text-align: left; padding: 10px;" />
+            <button class="btn-action" style="margin:0; width:auto; padding: 0 15px; background: #4CAF50; box-shadow:0 4px 0 #388E3C;" onclick="addAccount()">THÊM</button>
         </div>
         <span class="filter-section-title">DANH SÁCH TÀI KHOẢN</span>
-        <div id="acc-list-container" class="scroll-list-sm"></div>
+        <div id="acc-list-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 10px;"></div>
     </div>
 </div>
-
 <div class="overlay" id="modal-filter">
-    <div class="modal-box acc-modal-border">
+    <div class="modal-box" style="border: 4px solid #EADDCB;">
         <span class="close-btn" onclick="closeFilterModal()">×</span>
-        <h3 class="modal-title">BỘ LỌC TÌM KIẾM <span class="btn-help-inline" onclick="showHelp('filter')">?</span></h3>
+        <h3 style="text-align: center; color: var(--primary-nau); margin-top: 0; font-size: 20px;">
+            BỘ LỌC TÌM KIẾM <span class="btn-help-inline" onclick="showHelp('filter')">?</span>
+        </h3>
         <span class="filter-section-title">1. LỌC THEO TÀI KHOẢN</span>
         <select id="f-acc" class="styled-select"></select>
+        
         <span class="filter-section-title">2. KIỂU LỌC BIẾN THỂ</span>
         <div class="radio-group">
-            <label class="radio-label"><input type="radio" name="f-type" value="exact"> [Chỉ lọc]</label>
-            <label class="radio-label"><input type="radio" name="f-type" value="includes" checked> [Bao gồm]</label>
+            <label class="radio-label"><input type="radio" name="f-type" value="exact" /> [Chỉ lọc]</label>
+            <label class="radio-label"><input type="radio" name="f-type" value="includes" checked /> [Bao gồm]</label>
         </div>
+        
         <span class="filter-section-title">3. TÊN NÔNG SẢN & BIẾN THỂ</span>
         <select id="f-prod" class="styled-select"></select>
         <select id="f-var" class="styled-select"></select>
-        <span class="filter-section-title">4. SẮP XẾP SỐ KG</span>
-        <div class="radio-group">
-            <label class="radio-label"><input type="radio" name="f-sort" value="desc" checked> Giảm dần</label>
-            <label class="radio-label"><input type="radio" name="f-sort" value="asc"> Tăng dần</label>
+        
+        <span class="filter-section-title">4. SẮP XẾP theo SỐ KG</span>
+        <div class="radio-group" style="margin-bottom: 20px;">
+            <label class="radio-label"><input type="radio" name="f-sort" value="desc" checked /> Giảm dần</label>
+            <label class="radio-label"><input type="radio" name="f-sort" value="asc" /> Tăng dần</label>
         </div>
-        <button class="btn-action btn-filter-exec" onclick="execFilter()">LỌC NGAY</button>
+        <button class="btn-action" style="background: var(--btn-blue); box-shadow: 0 4px 0 #3B82F6;" onclick="execFilter()">LỌC</button>
     </div>
 </div>
 
 <div class="overlay" id="modal-add-stock">
     <div class="modal-box">
         <span class="close-btn" onclick="closeAddStockModal()">×</span>
-        <h3 class="modal-title">NHẬP NÔNG SẢN <span class="btn-help-inline" onclick="showHelp('add')">?</span></h3>
-        <label>TÀI KHOẢN</label>
+        <h3 style="color: var(--primary-nau); margin-top: 0; font-size: 20px;">
+            NHẬP NÔNG SẢN VÀO KHO <span class="btn-help-inline" onclick="showHelp('add')">?</span>
+        </h3>
+        <label style="margin-bottom: 4px;">CHỌN TÀI KHOẢN NHẬP</label>
         <select id="add-stock-acc" class="styled-select"></select>
         <div class="input-row">
-            <div class="input-group"><label>CÂN NẶNG (KG)</label><input type="number" id="add-w" step="0.01"></div>
-            <div class="input-group"><label>SỐ LƯỢNG</label><input type="number" id="add-q" value="1"></div>
+            <div class="input-group"><label>CÂN NẶNG (KG)</label><input type="number" id="add-w" step="0.01" /></div>
+            <div class="input-group"><label>SỐ LƯỢNG</label><input type="number" id="add-q" value="1" /></div>
         </div>
-        <div class="grid-options scroll-list-md" id="add-variants"></div>
-        <button class="btn-action btn-save-stock" onclick="saveStock()">NHẬP KHO</button>
+        <div class="grid-options" id="add-variants" style="max-height: 200px; overflow-y: auto;"></div>
+        <button class="btn-action" style="background: var(--btn-blue); box-shadow: 0 5px 0 #3B82F6; margin-top: 15px;" onclick="saveStock()">NHẬP</button>
     </div>
 </div>
 
 <div class="overlay" id="modal-calc">
-    <div class="modal-box acc-modal-border">
+    <div class="modal-box" style="border: 4px solid #EADDCB;">
         <span class="close-btn" onclick="closeCalcModal()">×</span>
-        <h3 class="modal-title">CÂN NÔNG SẢN <span class="btn-help-inline" onclick="showHelp('calc')">?</span></h3>
+        <h3 style="text-align: center; color: var(--primary-nau); margin-top: 0; font-size: 20px;"> CÂN NÔNG SẢN <span class="btn-help-inline" onclick="showHelp('calc')">?</span></h3>
         <div class="tabs">
             <div class="tab active" id="tab-btn1" onclick="switchTab(1)">Biến thể</div>
             <div class="tab" id="tab-btn2" onclick="switchTab(2)">Nông sản</div>
         </div>
-        <div class="tab-content active-content" id="tab1"><div class="grid-options scroll-list-md" id="calc-vars"></div></div>
-        <div class="tab-content" id="tab2"><div class="grid-options scroll-list-md" id="calc-prods"></div></div>
+        <div class="tab-content active-content" id="tab1"><div class="grid-options" id="calc-vars" style="max-height: 200px; overflow-y: auto;"></div></div>
+        <div class="tab-content" id="tab2"><div class="grid-options" id="calc-prods" style="max-height: 200px; overflow-y: auto;"></div></div>
         <div class="input-row">
-            <div class="input-group"><label>CÂN NẶNG (kg)</label><input type="number" id="calc-w" step="0.01"></div>
-            <div class="input-group"><label>BẠN BÈ (x3%): <span id="f-val">0</span></label><input type="range" id="calc-f" min="0" max="5" value="0" oninput="document.getElementById('f-val').innerText=this.value"></div>
+            <div class="input-group"><label>CÂN NẶNG (kg)</label><input type="number" id="calc-w" step="0.01" /></div>
+            <div class="input-group"><label>BẠN BÈ (x3%): <span id="f-val">0</span></label><input type="range" id="calc-f" min="0" max="5" value="0" style="width:100%" oninput="document.getElementById('f-val').innerText=this.value" /></div>
         </div>
-        <div class="calc-actions">
-            <button class="btn-action btn-calc-exec" onclick="execCalc()">CÂN</button>
-            <button class="btn-action btn-calc-clear" onclick="clearCalc()">XÓA</button>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button class="btn-action" style="flex: 2; background: var(--btn-blue); box-shadow: 0 4px 0 #3B82F6;" onclick="execCalc()">CÂN</button>
+            <button class="btn-action" style="flex: 1; background: #FF6B6B; box-shadow: 0 4px 0 #D15252;" onclick="clearCalc()">XÓA</button>
         </div>
-        <div id="calc-history" class="scroll-list-sm history-box"></div>
-        <div class="total-display compact-total"><span>TỔNG XU ĐÃ CÂN</span><strong id="calc-sum">0 xu</strong></div>
+        <div id="calc-history" style="margin: 10px 0; max-height: 120px; overflow-y: auto; background: white; border-radius: 10px; padding: 10px; font-size: 13px;"></div>
+        <div class="total-display" style="margin: 0; padding: 10px;"><span>TỔNG XU ƯỚC TÍNH ĐÃ CÂN</span><strong id="calc-sum">0 xu</strong></div>
     </div>
 </div>
 
 <div class="overlay" id="modal-help-popup">
-    <div class="modal-box help-modal-border">
-        <h3 class="modal-title">📖 HƯỚNG DẪN</h3>
-        <div class="help-popup-text" id="help-popup-content"></div>
-        <button class="btn-action btn-help-close" onclick="closeHelp()">ĐÃ HIỂU</button>
+    <div class="modal-box" style="border: 4px solid #8B5E3C; max-width: 380px;">
+        <h3 style="text-align: center; color: var(--primary-nau); margin-top: 0; font-size: 20px;"> 📖 HƯỚNG DẪN MỤC</h3>
+        <div class="help-popup-text" id="help-popup-content">Nội dung...</div>
+        <button class="btn-action" style="background: #4CAF50; box-shadow: 0 4px 0 #388E3C;" onclick="closeHelp()">ĐÃ HIỂU</button>
     </div>
 </div>
-
 <script src="script.js"></script>
 </body>
 </html>

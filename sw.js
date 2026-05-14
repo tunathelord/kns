@@ -1,6 +1,6 @@
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open('ptg-v2').then((cache) => cache.addAll(['index.html', 'manifest.json']))
+    caches.open('ptg-v1').then((cache) => cache.addAll(['index.html', 'manifest.json']))
   );
 });
 self.addEventListener('fetch', (e) => {
