@@ -1,202 +1,14 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Kho PTG">
-
-<script>
-  // Đăng ký Service Worker để chạy offline
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kho Nông Sản PTG</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700;800;900&display=swap');
-        :root {
-            --bg-body: #fffaf0; /* Đổi màu nền tổng sang màu kem ngọt ngào của bạn */
-            --bg-modal: #F0E1CF; --bg-content: #FDF6EC;
-            --primary-nau: #8B5E3C; --accent-gold: #FFD700; --btn-blue: #4DA6FF;
-            --text-inactive: #BFA595;
-        }
-        ::-webkit-scrollbar { display: none; }
-
-        * {
-            font-family: 'Comfortaa', cursive !important;
-            box-sizing: border-box;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        
-        /* Khóa cứng khung nền hệ thống không cho kéo trôi */
-        html, body {
-            overscroll-behavior-y: contain; 
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-body);
-        }
-
-        .tuna-app-wrapper {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: var(--bg-body); display: flex; justify-content: center; align-items: center; z-index: 99999;
-        }
-        
-        /* Container tràn màn hình cho giao diện APK/EXE chuyên nghiệp */
-        .app-container {
-            width: 100%; height: 100vh; background: var(--bg-body);
-            padding: 20px 20px; position: relative; display: flex; flex-direction: column; overflow: hidden;
-            border: none; border-radius: 0; box-shadow: none;
-        }
-
-        .view-section { display: none; flex-direction: column; flex: 1; height: 100%; overflow: hidden; animation: popIn 0.3s ease-out; }
-        .view-section.active-view { display: flex; }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
-        
-        /* HEADER */
-        .header-wrap { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 18px; gap: 10px; }
-        .header-title { color: var(--primary-nau); font-size: 24px; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; flex: 1; text-align: left; }
-        .btn-header-icon { background: #F4EAE0; border: 2px solid #E0D0C0; width: 42px; height: 42px; border-radius: 12px; display: flex; justify-content: center; align-items: center;
-        cursor: pointer; box-shadow: 0 4px 0 #D1BBA4; font-size: 18px; }
-        .btn-header-icon:active { transform: translateY(4px); box-shadow: none; }
-        .total-display { background: var(--primary-nau); padding: 15px; border-radius: 20px; color: #fff; box-shadow: 0 6px 0 #5D3F28; text-align: center; margin-bottom: 22px;
-        flex-shrink: 0; }
-        .total-display span { display: block; font-size: 12px; color: #d2b48c; font-weight: 600; }
-        .total-display strong { font-size: 28px; color: var(--accent-gold); font-weight: 800; }
-        
-        /* GRID NÔNG SẢN - Chỉ cho phép cuộn bên trong vùng này */
-        .grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); 
-            gap: 18px; 
-            padding: 8px 8px 90px 8px; 
-            overflow-y: auto; 
-            flex: 1; 
-            overscroll-behavior-y: contain;
-            -webkit-overflow-scrolling: touch;
-        }
-        .item-card { background: white; border-radius: 22px; padding: 20px 10px; text-align: center; border: 2px solid #F0E5D8;
-        box-shadow: 0 4px 8px rgba(139, 94, 60, 0.04); cursor: pointer; position: relative; transition: transform 0.2s, box-shadow 0.2s; }
-        .item-card:active { transform: scale(0.96); box-shadow: none; }
-        .badge-qty { position: absolute; top: -6px; right: -6px; background: var(--btn-blue); color: white; padding: 0 10px; border-radius: 12px; font-size: 13px;
-        font-weight: 800; border: 2px solid #fff; }
-        .item-icon { font-size: 36px; display: block; margin-bottom: 6px; }
-        .item-name { font-size: 15px; font-weight: 700; color: var(--primary-nau); }
-        
-        /* TAG TÀI KHOẢN */
-        .acc-tag { background: #A47551; color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-block; margin-top: 4px;
-        text-transform: uppercase; }
-        
-        /* BIẾN THỂ COLOR */
-        .c-anh-vang { color: #E0A800 !important; } .c-cau-vong { color: #FF0000 !important; font-weight: 800 !important; }
-        .c-am-uot { color: #2196F3 !important; } .c-nhiem-dien { color: #FF9800 !important; }
-        .c-gio { color: #00BCD4 !important; } .c-khi-lanh { color: #3F51B5 !important; }
-        .c-cat { color: #795548 !important; } .c-anh-trang { color: #9C27B0 !important; }
-        .c-bang { color: #81D4FA !important; } .c-cuc-quang { color: #00E676 !important; }
-        .c-suong { color: #9E9E9E !important; } .c-kho { color: #A52A2A !important; }
-        .c-nguyen-rua { color: #311B92 !important; } .c-den-troi { color: #FF5722 !important; }
-        .c-ao-anh { color: #F06292 !important; } .c-phao-hoa { color: #E91E63 !important; }
-        .c-buom { color: #F48FB1 !important; } .c-giai-dieu { color: #4DB6AC !important; }
-        
-        /* BUTTONS */
-        .btn-back-3d { background: #F4EAE0; border: 2px solid #E0D0C0; color: var(--primary-nau); width: 45px; height: 45px; border-radius: 12px; font-size: 22px; cursor: pointer;
-        box-shadow: 0 4px 0 #D1BBA4; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .btn-back-3d:active { transform: translateY(4px); box-shadow: none; margin-bottom: 4px; }
-
-        .bottom-calc-btn {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 350px; height: 50px; border-radius: 12px;
-            background: #F3A536; color: white; font-size: 16px; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 1px; border: none; cursor: pointer;
-            box-shadow: 0 5px 0 #D48A2A; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.1s;
-        }
-        .bottom-calc-btn:active { transform: translate(-50%, 5px); box-shadow: none; }
-
-        /* MODAL */
-        .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center;
-        z-index: 999999; padding: 15px; backdrop-filter: blur(4px); }
-        .modal-box { background: var(--bg-modal); width: 100%; max-width: 450px; border-radius: 30px; padding: 25px; max-height: 85vh; overflow-y: auto; position: relative; }
-        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 26px; color: var(--primary-nau); cursor: pointer; font-weight: 800; background: #EADDCB; width: 36px;
-        height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 2; }
-
-        .filter-section-title { font-size: 12px; font-weight: 800; color: #a47551; margin: 15px 0 5px 0; display: block; border-bottom: 2px solid #EADDCB;
-        padding-bottom: 3px; text-transform: uppercase; }
-        .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .radio-label { flex: 1; background: white; padding: 10px; border-radius: 12px; font-size: 13px; font-weight: 700; color: var(--primary-nau); display: flex; align-items: center;
-        gap: 5px; cursor: pointer; border-bottom: 3px solid #E0E0E0; }
-        .radio-label input { accent-color: #F3A536; transform: scale(1.2); }
-        .styled-select { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #E0D0C0; background: white; font-family: 'Baloo 2'; font-weight: 700;
-        color: var(--primary-nau); outline: none; margin-bottom: 10px; appearance: none; font-size: 14px; }
-
-        /* LIST TÀI KHOẢN TRONG MODAL */
-        .acc-item-row { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 15px; border-radius: 12px; margin-bottom: 8px;
-        border-bottom: 3px solid #E0E0E0; }
-        .acc-item-name { font-weight: 800; color: var(--primary-nau); font-size: 15px; }
-        .acc-item-actions { display: flex; gap: 6px; }
-        .btn-acc-action { border: none; border-radius: 8px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white;
-        padding: 6px 10px; font-size: 12px; }
-        .tabs { display: flex; gap: 15px; margin-bottom: 10px; border-bottom: 2px solid #EADDCB; }
-        .tab { padding: 5px 0; cursor: pointer; color: var(--text-inactive); font-weight: 800; position: relative; font-size: 16px; }
-        .tab.active { color: var(--primary-nau); }
-        .tab.active::after { content: ""; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: var(--primary-nau); }
-        .tab-content { display: none; background: var(--bg-content); border-radius: 15px; padding: 15px; }
-        .tab-content.active-content { display: block; }
-        .grid-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
-        .opt-item { background: white; border-radius: 12px; padding: 10px 8px; font-size: 13px; font-weight: 700; border-bottom: 3px solid #E0E0E0; cursor: pointer;
-        text-align: center; }
-        .opt-item.selected { border-bottom-color: #F3A536; background: #FFF9F0; color: #F3A536; }
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
-        .input-group { background: white; padding: 10px; border-radius: 15px; border-bottom: 3px solid #E0E0E0; }
-        label { font-size: 11px; font-weight: 800; color: var(--primary-nau); display: block; }
-        input[type="number"], input[type="text"] { width: 100%; border: none; background: #F4EAE0; padding: 8px; border-radius: 8px; text-align: center; font-weight: 800; outline: none;
-        font-size: 15px; }
-        .btn-action { width: 100%; padding: 12px; border-radius: 15px; border: none; font-weight: 800; color: white; cursor: pointer; text-transform: uppercase; margin-top: 5px;
-        font-size: 15px; }
-        
-        @media (max-width: 550px) {
-            .app-container { padding: 15px 15px; width: 100%; height: 100vh; }
-            .grid-container { grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 85px; }
-            .header-title { font-size: 19px; }
-            .item-card { padding: 14px 6px; border-radius: 18px; }
-            .item-icon { font-size: 30px; }
-            .item-name { font-size: 14px; }
-        }
-        
-        .btn-help-inline {
-            background: #FFF; border: 2px solid #C4A484; width: 26px; height: 26px;
-            border-radius: 50%; display: inline-flex; justify-content: center; align-items: center;
-            cursor: pointer; font-size: 13px; font-weight: 900; color: #8B5E3C; margin-left: 8px;
-            vertical-align: middle; box-shadow: 0 2px 0 #C4A484; transition: all 0.1s;
-        }
-        .btn-help-inline:active { transform: translateY(2px); box-shadow: none; }
-        
-        .btn-follow-dev {
-            display: block; text-align: center; color: #3B82F6; text-decoration: none;
-            font-weight: 800; font-size: 11px; border: 2px dashed #3B82F6;
-            padding: 6px; border-radius: 12px; background: #EFF6FF; transition: all 0.2s;
-        }
-        .btn-follow-dev:hover { background: #DBEAFE; }
-        
-        .help-popup-text {
-            color: #5D3F28; font-size: 13px; font-weight: 700; line-height: 1.6;
-            background: white; padding: 15px; border-radius: 15px; border: 2px solid #EADDCB; margin: 15px 0;
-        }
-        b, strong { font-weight: 900 !important; }
-
-        /* Các phân vùng danh sách phụ cũng được gán cuộn mượt */
-        #sub-list, #filter-list {
-            overflow-y: auto;
-            overscroll-behavior-y: contain;
-            -webkit-overflow-scrolling: touch;
-        }
-    </style>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kho PTG">
 </head>
 <body>
 
@@ -206,8 +18,8 @@
             <div class="header-wrap">
                 <h1 class="header-title">KHO NÔNG SẢN PTG</h1>
                 <a href="https://www.tiktok.com/@tunasama.206" target="_blank" class="btn-follow-dev">🔗 THEO DÕI / BÁO LỖI</a>
-                <button class="btn-header-icon" title="Quản lý tài khoản" onclick="openAccModal()"> 👥 </button>
-                <button class="btn-header-icon" title="Bộ lọc tìm kiếm" onclick="openFilterModal()"> 🔍 </button>
+                <button class="btn-header-icon" onclick="openAccModal()"> 👥 </button>
+                <button class="btn-header-icon" onclick="openFilterModal()"> 🔍 </button>
             </div>
             <div class="total-display"><span>TỔNG GIÁ TRỊ KHO ƯỚC TÍNH</span><strong id="inv-total">0 xu</strong></div>
             <div class="grid-container" id="inv-grid"></div>
@@ -220,7 +32,7 @@
                 <h2 id="sub-title" style="margin: 0 0 0 15px; color: var(--primary-nau); font-size: 22px;"></h2>
             </div>
             <div id="sub-list" style="flex: 1; padding-bottom: 80px;"></div>
-            <button class="bottom-calc-btn" style="right: 20px; left: auto; transform: none; width: 60px; height: 60px; border-radius: 50%; background: var(--btn-blue); box-shadow: 0 6px 0 #3B82F6; font-size: 26px;" onclick="openAddStockModal()"> ＋ </button>
+            <button class="bottom-calc-btn fab-btn" onclick="openAddStockModal()"> ＋ </button>
         </div>
         
         <div id="filter-result-view" class="view-section">
@@ -228,375 +40,101 @@
                 <button class="btn-back-3d" onclick="closeFilterResultView()"> ⬅ </button>
                 <h2 style="margin: 0 0 0 15px; color: var(--primary-nau); font-size: 22px;">KẾT QUẢ LỌC</h2>
             </div>
-            <div style="background: white; padding: 12px; border-radius: 15px; text-align: center; font-weight: 700; color: var(--primary-nau); margin-bottom: 12px; box-shadow: 0 4px 0 #E0E0E0; font-size: 14px;">
-                Đã tìm thấy: <span id="filter-count" style="color: #F3A536; font-size: 18px; font-weight: 800;">0</span> mục
-            </div>
+            <div class="filter-count-badge"> Đã tìm thấy: <span id="filter-count">0</span> mục </div>
             <div id="filter-list" style="flex: 1; padding-bottom: 80px;"></div>
         </div>
     </div>
 </div>
 
 <div class="overlay" id="modal-acc">
-    <div class="modal-box" style="border: 4px solid #EADDCB;">
+    <div class="modal-box acc-modal-border">
         <span class="close-btn" onclick="closeAccModal()">×</span>
-        <h3 style="text-align: center; color: var(--primary-nau); margin-top: 0; font-size: 20px;">
-            QUẢN LÝ TÀI KHOẢN <span class="btn-help-inline" onclick="showHelp('acc')">?</span>
-        </h3>
-        <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-            <input type="text" id="new-acc-name" placeholder="Nhập tên tài khoản mới..." style="text-align: left; padding: 10px;" />
-            <button class="btn-action" style="margin:0; width:auto; padding: 0 15px; background: #4CAF50; box-shadow:0 4px 0 #388E3C;" onclick="addAccount()">THÊM</button>
+        <h3 class="modal-title">QUẢN LÝ TÀI KHOẢN <span class="btn-help-inline" onclick="showHelp('acc')">?</span></h3>
+        
+        <div class="backup-group">
+            <button onclick="exportData()" class="btn-action btn-export">XUẤT DỮ LIỆU</button>
+            <button onclick="document.getElementById('fileInput').click()" class="btn-action btn-import">NHẬP DỮ LIỆU</button>
+            <input type="file" id="fileInput" style="display:none" accept=".json" onchange="importData(event)">
+        </div>
+
+        <div class="input-inline-group">
+            <input type="text" id="new-acc-name" placeholder="Tên tài khoản mới...">
+            <button class="btn-action btn-add" onclick="addAccount()">THÊM</button>
         </div>
         <span class="filter-section-title">DANH SÁCH TÀI KHOẢN</span>
-        <div id="acc-list-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 10px;"></div>
+        <div id="acc-list-container" class="scroll-list-sm"></div>
     </div>
 </div>
 
 <div class="overlay" id="modal-filter">
-    <div class="modal-box" style="border: 4px solid #EADDCB;">
+    <div class="modal-box acc-modal-border">
         <span class="close-btn" onclick="closeFilterModal()">×</span>
-        <h3 style="text-align: center; color: var(--primary-nau); margin-top: 0; font-size: 20px;">
-            BỘ LỌC TÌM KIẾM <span class="btn-help-inline" onclick="showHelp('filter')">?</span>
-        </h3>
+        <h3 class="modal-title">BỘ LỌC TÌM KIẾM <span class="btn-help-inline" onclick="showHelp('filter')">?</span></h3>
         <span class="filter-section-title">1. LỌC THEO TÀI KHOẢN</span>
         <select id="f-acc" class="styled-select"></select>
-        
         <span class="filter-section-title">2. KIỂU LỌC BIẾN THỂ</span>
         <div class="radio-group">
-            <label class="radio-label"><input type="radio" name="f-type" value="exact" /> [Chỉ lọc]</label>
-            <label class="radio-label"><input type="radio" name="f-type" value="includes" checked /> [Bao gồm]</label>
+            <label class="radio-label"><input type="radio" name="f-type" value="exact"> [Chỉ lọc]</label>
+            <label class="radio-label"><input type="radio" name="f-type" value="includes" checked> [Bao gồm]</label>
         </div>
-        
         <span class="filter-section-title">3. TÊN NÔNG SẢN & BIẾN THỂ</span>
         <select id="f-prod" class="styled-select"></select>
         <select id="f-var" class="styled-select"></select>
-        
-        <span class="filter-section-title">4. SẮP XẾP theo SỐ KG</span>
-        <div class="radio-group" style="margin-bottom: 20px;">
-            <label class="radio-label"><input type="radio" name="f-sort" value="desc" checked /> Giảm dần</label>
-            <label class="radio-label"><input type="radio" name="f-sort" value="asc" /> Tăng dần</label>
+        <span class="filter-section-title">4. SẮP XẾP SỐ KG</span>
+        <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="f-sort" value="desc" checked> Giảm dần</label>
+            <label class="radio-label"><input type="radio" name="f-sort" value="asc"> Tăng dần</label>
         </div>
-        <button class="btn-action" style="background: var(--btn-blue); box-shadow: 0 4px 0 #3B82F6;" onclick="execFilter()">LỌC</button>
+        <button class="btn-action btn-filter-exec" onclick="execFilter()">LỌC NGAY</button>
     </div>
 </div>
 
 <div class="overlay" id="modal-add-stock">
     <div class="modal-box">
         <span class="close-btn" onclick="closeAddStockModal()">×</span>
-        <h3 style="color: var(--primary-nau); margin-top: 0; font-size: 20px;">
-            NHẬP NÔNG SẢN VÀO KHO <span class="btn-help-inline" onclick="showHelp('add')">?</span>
-        </h3>
-        <label style="margin-bottom: 4px;">CHỌN TÀI KHOẢN NHẬP</label>
+        <h3 class="modal-title">NHẬP NÔNG SẢN <span class="btn-help-inline" onclick="showHelp('add')">?</span></h3>
+        <label>TÀI KHOẢN</label>
         <select id="add-stock-acc" class="styled-select"></select>
         <div class="input-row">
-            <div class="input-group"><label>CÂN NẶNG (KG)</label><input type="number" id="add-w" step="0.01" /></div>
-            <div class="input-group"><label>SỐ LƯỢNG</label><input type="number" id="add-q" value="1" /></div>
+            <div class="input-group"><label>CÂN NẶNG (KG)</label><input type="number" id="add-w" step="0.01"></div>
+            <div class="input-group"><label>SỐ LƯỢNG</label><input type="number" id="add-q" value="1"></div>
         </div>
-        <div class="grid-options" id="add-variants" style="max-height: 200px; overflow-y: auto;"></div>
-        <button class="btn-action" style="background: var(--btn-blue); box-shadow: 0 5px 0 #3B82F6; margin-top: 15px;" onclick="saveStock()">NHẬP</button>
+        <div class="grid-options scroll-list-md" id="add-variants"></div>
+        <button class="btn-action btn-save-stock" onclick="saveStock()">NHẬP KHO</button>
     </div>
 </div>
 
 <div class="overlay" id="modal-calc">
-    <div class="modal-box" style="border: 4px solid #EADDCB;">
+    <div class="modal-box acc-modal-border">
         <span class="close-btn" onclick="closeCalcModal()">×</span>
-        <h3 style="text-align: center; color: var(--primary-nau); margin-top: 0; font-size: 20px;"> CÂN NÔNG SẢN <span class="btn-help-inline" onclick="showHelp('calc')">?</span></h3>
+        <h3 class="modal-title">CÂN NÔNG SẢN <span class="btn-help-inline" onclick="showHelp('calc')">?</span></h3>
         <div class="tabs">
             <div class="tab active" id="tab-btn1" onclick="switchTab(1)">Biến thể</div>
             <div class="tab" id="tab-btn2" onclick="switchTab(2)">Nông sản</div>
         </div>
-        <div class="tab-content active-content" id="tab1"><div class="grid-options" id="calc-vars" style="max-height: 200px; overflow-y: auto;"></div></div>
-        <div class="tab-content" id="tab2"><div class="grid-options" id="calc-prods" style="max-height: 200px; overflow-y: auto;"></div></div>
+        <div class="tab-content active-content" id="tab1"><div class="grid-options scroll-list-md" id="calc-vars"></div></div>
+        <div class="tab-content" id="tab2"><div class="grid-options scroll-list-md" id="calc-prods"></div></div>
         <div class="input-row">
-            <div class="input-group"><label>CÂN NẶNG (kg)</label><input type="number" id="calc-w" step="0.01" /></div>
-            <div class="input-group"><label>BẠN BÈ (x3%): <span id="f-val">0</span></label><input type="range" id="calc-f" min="0" max="5" value="0" style="width:100%" oninput="document.getElementById('f-val').innerText=this.value" /></div>
+            <div class="input-group"><label>CÂN NẶNG (kg)</label><input type="number" id="calc-w" step="0.01"></div>
+            <div class="input-group"><label>BẠN BÈ (x3%): <span id="f-val">0</span></label><input type="range" id="calc-f" min="0" max="5" value="0" oninput="document.getElementById('f-val').innerText=this.value"></div>
         </div>
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <button class="btn-action" style="flex: 2; background: var(--btn-blue); box-shadow: 0 4px 0 #3B82F6;" onclick="execCalc()">CÂN</button>
-            <button class="btn-action" style="flex: 1; background: #FF6B6B; box-shadow: 0 4px 0 #D15252;" onclick="clearCalc()">XÓA</button>
+        <div class="calc-actions">
+            <button class="btn-action btn-calc-exec" onclick="execCalc()">CÂN</button>
+            <button class="btn-action btn-calc-clear" onclick="clearCalc()">XÓA</button>
         </div>
-        <div id="calc-history" style="margin: 10px 0; max-height: 120px; overflow-y: auto; background: white; border-radius: 10px; padding: 10px; font-size: 13px;"></div>
-        <div class="total-display" style="margin: 0; padding: 10px;"><span>TỔNG XU ƯỚC TÍNH ĐÃ CÂN</span><strong id="calc-sum">0 xu</strong></div>
+        <div id="calc-history" class="scroll-list-sm history-box"></div>
+        <div class="total-display compact-total"><span>TỔNG XU ĐÃ CÂN</span><strong id="calc-sum">0 xu</strong></div>
     </div>
 </div>
 
 <div class="overlay" id="modal-help-popup">
-    <div class="modal-box" style="border: 4px solid #8B5E3C; max-width: 380px;">
-        <h3 style="text-align: center; color: var(--primary-nau); margin-top: 0; font-size: 20px;"> 📖 HƯỚNG DẪN MỤC</h3>
-        <div class="help-popup-text" id="help-popup-content">Nội dung...</div>
-        <button class="btn-action" style="background: #4CAF50; box-shadow: 0 4px 0 #388E3C;" onclick="closeHelp()">ĐÃ HIỂU</button>
+    <div class="modal-box help-modal-border">
+        <h3 class="modal-title">📖 HƯỚNG DẪN</h3>
+        <div class="help-popup-text" id="help-popup-content"></div>
+        <button class="btn-action btn-help-close" onclick="closeHelp()">ĐÃ HIỂU</button>
     </div>
 </div>
 
-<script>
-    const vColors = { "Ánh vàng": "c-anh-vang", "Cầu vồng": "c-cau-vong", "Ẩm ướt": "c-am-uot", "Nhiễm điện": "c-nhiem-dien", "Gió": "c-gio", "Khí lạnh": "c-khi-lanh", "Cát": "c-cat", "Ánh trăng": "c-anh-trang", "Băng": "c-bang", "Cực quang": "c-cuc-quang", "Sương": "c-suong", "Khô": "c-kho", "Nguyền rủa": "c-nguyen-rua", "Đèn trời": "c-den-troi", "Ảo ảnh": "c-ao-anh", "Pháo hoa": "c-phao-hoa", "Bướm": "c-buom", "Giai điệu": "c-giai-dieu" };
-    const products = [ {name:"Nhân sâm", p:725000, i:" 🥕 "}, {name:"Bánh bao", p:180000, i:" 🥟 "}, {name:"Cây Đậu", p:12000, i:" 🫘 "}, {name:"Khế", p:10000, i:" ⭐ "}, {name:"Đào giòn", p:8500, i:" 🍑 "}, {name:"Táo đường", p:7600, i:" 🍎 "}, {name:"Dưa hấu", p:5800, i:" 🍉 "}, {name:"Bí ngô", p:5167, i:" 🎃 "}, {name:"Người tuyết", p:4600, i:" ⛄ "}, {name:"Xoài", p:3000, i:" 🥭 "}, {name:"Sầu riêng", p:2500, i:" 🍈 "}, {name:"Xương rồng", p:2300, i:" 🌵 "}, {name:"Táo", p:2200, i:" 🍎 "}, {name:"Nho", p:1050, i:" 🍇 "}, {name:"Dừa", p:1000, i:" 🥥 "}, {name:"Cây tùng", p:300, i:" 🌲 "} ];
-    const variants = [ {n:"Ánh vàng", v:3, t:"r"}, {n:"Cầu vồng", v:2, t:"r"}, {n:"Ẩm ướt", v:0.1, t:"e"}, {n:"Nhiễm điện", v:0.2, t:"e"}, {n:"Gió", v:0.2, t:"e"}, {n:"Khí lạnh", v:0.4, t:"e"}, {n:"Cát", v:0.2, t:"e"}, {n:"Ánh trăng", v:0.4, t:"e"}, {n:"Băng", v:0.3, t:"e"}, {n:"Cực quang", v:0.4, t:"e"}, {n:"Sương", v:0.4, t:"e"}, {n:"Khô", v:0.2, t:"e"}, {n:"Nguyền rủa", v:0.2, t:"e"}, {n:"Đèn trời", v:0.4, t:"e"}, {n:"Ảo ảnh", v:0.3, t:"e"}, {n:"Pháo hoa", v:0.2, t:"e"}, {n:"Bướm", v:0.3, t:"e"}, {n:"Giai điệu", v:0.3, t:"e"} ];
-    
-    let accounts = JSON.parse(localStorage.getItem('tuna_farm_accounts')) || ["Acc_Chính"];
-    let inventory = JSON.parse(localStorage.getItem('tuna_farm_data')) || products.map(p => ({...p, items: []}));
-    let curF = null; let calcHist = [];
-
-    function saveData() {
-        localStorage.setItem('tuna_farm_accounts', JSON.stringify(accounts));
-        localStorage.setItem('tuna_farm_data', JSON.stringify(inventory));
-    }
-
-    function renderInv() {
-        const grid = document.getElementById('inv-grid'); grid.innerHTML = ''; let total = 0;
-        inventory.forEach(f => {
-            let q = 0; f.items.forEach(it => {
-                q += it.q; let rm = 1, eb = 0;
-                it.vars.forEach(v => { let d = variants.find(x => x.n === v); if(d) d.t === 'r' ? rm *= d.v : eb += d.v; });
-                total += Math.floor(it.w * f.p * rm * (1 + eb)) * it.q;
-            });
-            grid.innerHTML += `<div class="item-card" onclick="openSub('${f.name}')"><span class="badge-qty">${q}</span><span class="item-icon">${f.i}</span><span class="item-name">${f.name}</span></div>`;
-        });
-        document.getElementById('inv-total').innerText = total.toLocaleString() + ' xu';
-        saveData();
-    }
-
-    function openAccModal() {
-        document.getElementById('modal-acc').style.display = 'flex';
-        renderAccList();
-    }
-    function closeAccModal() { document.getElementById('modal-acc').style.display = 'none'; }
-
-    function renderAccList() {
-        const container = document.getElementById('acc-list-container');
-        if(accounts.length === 0) { container.innerHTML = `<p style="text-align:center;color:gray;font-size:13px;">Chưa có tài khoản nào. Hãy tạo mới!</p>`; return; }
-        container.innerHTML = accounts.map((acc, index) => `
-            <div class="acc-item-row">
-                <span class="acc-item-name">${acc}</span>
-                <div class="acc-item-actions">
-                    <button class="btn-acc-action" style="background:#FFA500; box-shadow:0 3px 0 #CC8400;" onclick="renameAccount('${acc}')">SỬA</button>
-                    <button class="btn-acc-action" style="background:#FF6B6B; box-shadow:0 3px 0 #D15252;" onclick="deleteAccount('${acc}')">×</button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function addAccount() {
-        const input = document.getElementById('new-acc-name');
-        let name = input.value.trim();
-        if(!name) { name = "Acc_" + (accounts.length + 1); }
-        if(accounts.includes(name)) { alert("Tên tài khoản này đã tồn tại!"); return; }
-        accounts.push(name); input.value = ''; renderAccList(); saveData();
-    }
-
-    function renameAccount(oldName) {
-        const newName = prompt("Nhập tên mới cho tài khoản '" + oldName + "':", oldName);
-        if(!newName || newName.trim() === '' || newName === oldName) return;
-        if(accounts.includes(newName.trim())) { alert("Tên tài khoản mới đã tồn tại!"); return; }
-
-        const idx = accounts.indexOf(oldName);
-        accounts[idx] = newName.trim();
-        inventory.forEach(prod => {
-            prod.items.forEach(item => { if(item.acc === oldName) item.acc = newName.trim(); });
-        });
-        renderAccList(); renderInv();
-    }
-
-    function deleteAccount(accName) {
-        if(confirm(`Bạn có chắc chắn muốn xóa tài khoản [${accName}]?\nHành động này sẽ XÓA TOÀN BỘ nông sản của tài khoản này trong kho!`)) {
-            accounts = accounts.filter(a => a !== accName);
-            inventory.forEach(prod => { prod.items = prod.items.filter(item => item.acc !== accName); });
-            renderAccList(); renderInv(); if(curF) renderSubList();
-        }
-    }
-
-    function openFilterModal() {
-        document.getElementById('modal-filter').style.display = 'flex';
-        let accSelect = `<option value="all">-- Tất cả tài khoản --</option>`;
-        accounts.forEach(a => accSelect += `<option value="${a}"> 👥 ${a}</option>`);
-        document.getElementById('f-acc').innerHTML = accSelect;
-        
-        let prodSelect = `<option value="all">-- Tất cả nông sản --</option>`;
-        products.forEach(p => prodSelect += `<option value="${p.name}">${p.i} ${p.name}</option>`);
-        document.getElementById('f-prod').innerHTML = prodSelect;
-
-        let varSelect = `<option value="all">-- Tất cả biến thể --</option>`;
-        variants.forEach(v => varSelect += `<option value="${v.n}">${v.n}</option>`);
-        document.getElementById('f-var').innerHTML = varSelect;
-    }
-
-    function closeFilterModal() { document.getElementById('modal-filter').style.display = 'none'; }
-    function closeFilterResultView() { document.getElementById('filter-result-view').classList.remove('active-view'); document.getElementById('main-view').classList.add('active-view'); renderInv(); }
-
-    function execFilter() {
-        const fAcc = document.getElementById('f-acc').value;
-        const fType = document.querySelector('input[name="f-type"]:checked').value;
-        const fProd = document.getElementById('f-prod').value;
-        const fVar = document.getElementById('f-var').value;
-        const fSort = document.querySelector('input[name="f-sort"]:checked').value;
-        let results = [];
-        
-        inventory.forEach(prod => {
-            if (fProd !== 'all' && prod.name !== fProd) return;
-            prod.items.forEach(item => {
-                if (fAcc !== 'all' && item.acc !== fAcc) return;
-
-                let match = true;
-                if (fVar !== 'all') {
-                    if (fType === 'exact') { match = (item.vars.length === 1 && item.vars[0] === fVar); }
-                    else { match = item.vars.includes(fVar); }
-                }
-                if (match) results.push({ pName: prod.name, pIcon: prod.i, ...item });
-            });
-        });
-        
-        results.sort((a, b) => fSort === 'desc' ? b.w - a.w : a.w - b.w);
-        document.getElementById('filter-count').innerText = results.length;
-        document.getElementById('filter-list').innerHTML = results.map(it => `
-            <div style="background:white; padding:15px; border-radius:15px; margin-bottom:12px; display:flex; align-items:center; border-bottom:3px solid #eee">
-                <span style="font-size:32px; margin-right:15px;">${it.pIcon}</span>
-                <div style="flex:1;">
-                    <b style="color:var(--primary-nau); font-size: 16px;">${it.pName} | ${it.w}kg (x${it.q})</b>
-                    <span class="acc-tag">${it.acc || 'Ẩn danh'}</span><br>
-                    <small style="font-weight:800; font-size: 13px;">${it.vars.map(v => `<span class="${vColors[v]}">${v}</span>`).join(', ') || 'Thường'}</small>
-                </div>
-            </div>
-        `).join('');
-        
-        closeFilterModal();
-        document.getElementById('main-view').classList.remove('active-view');
-        document.getElementById('filter-result-view').classList.add('active-view');
-    }
-
-    function openSub(n) { curF = inventory.find(x => x.name === n); document.getElementById('sub-title').innerText = curF.name; document.getElementById('main-view').classList.remove('active-view'); document.getElementById('sub-view').classList.add('active-view'); renderSubList(); }
-    function closeSubView() { document.getElementById('sub-view').classList.remove('active-view'); document.getElementById('main-view').classList.add('active-view'); renderInv(); }
-
-    function renderSubList() {
-        const list = document.getElementById('sub-list');
-        list.innerHTML = curF.items.map((it, i) => `
-            <div style="background:white; padding:15px; border-radius:15px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #eee">
-                <div>
-                    <b style="color:var(--primary-nau); font-size: 16px;">${it.w}kg (x${it.q})</b>
-                    <span class="acc-tag">${it.acc || 'Ẩn danh'}</span><br>
-                    <small style="font-weight:800; font-size: 13px;">${it.vars.map(v => `<span class="${vColors[v]}">${v}</span>`).join(', ') || 'Thường'}</small>
-                </div>
-                <button onclick="delStock(${i})" style="background:#FF6B6B; box-shadow: 0 4px 0 #D15252; color:white; border:none; border-radius:10px; width:40px; height:40px; font-weight:800; font-size: 20px; cursor: pointer;">×</button>
-            </div>
-        `).join('');
-    }
-
-    function openAddStockModal() {
-        if(accounts.length === 0) { alert("Vui lòng tạo ít nhất 1 tài khoản trước khi nhập hàng!"); return; }
-        document.getElementById('modal-add-stock').style.display = 'flex';
-
-        let accSelect = "";
-        accounts.forEach(a => accSelect += `<option value="${a}">${a}</option>`);
-        document.getElementById('add-stock-acc').innerHTML = accSelect;
-        document.getElementById('add-variants').innerHTML = variants.map(v => `<div class="opt-item" onclick="this.classList.toggle('selected')"><span class="${vColors[v.n]}">${v.n}</span></div>`).join('');
-    }
-    function closeAddStockModal() { document.getElementById('modal-add-stock').style.display = 'none'; }
-
-    function saveStock() {
-        const acc = document.getElementById('add-stock-acc').value;
-        const w = parseFloat(document.getElementById('add-w').value); const q = parseInt(document.getElementById('add-q').value);
-        if(!w || q < 1 || !acc) return;
-        const vs = Array.from(document.querySelectorAll('#add-variants .selected')).map(el => el.innerText.trim());
-        curF.items.push({w, q, vars: vs, acc: acc}); closeAddStockModal(); renderSubList();
-    }
-
-    function delStock(i) { if(confirm("Xóa mục này khỏi kho?")) { curF.items.splice(i, 1); renderSubList(); } }
-    
-    function openCalcModal() {
-        document.getElementById('modal-calc').style.display = 'flex';
-        document.getElementById('calc-vars').innerHTML = variants.map(v => `<div class="opt-item cv-opt" data-t="${v.t}" data-v="${v.v}" onclick="this.classList.toggle('selected')"><span class="${vColors[v.n]}">${v.n}</span></div>`).join('');
-        document.getElementById('calc-prods').innerHTML = products.map(p => `<div class="opt-item cp-opt" data-p="${p.p}" onclick="selP(this)">${p.i} ${p.name}</div>`).join('');
-    }
-    
-    function selP(el) { document.querySelectorAll('.cp-opt').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); }
-    function switchTab(n) { document.querySelectorAll('.tab, .tab-content').forEach(x => x.classList.remove('active', 'active-content')); document.getElementById('tab-btn'+n).classList.add('active'); document.getElementById('tab'+n).classList.add('active-content'); }
-    
-    function execCalc() {
-        const w = parseFloat(document.getElementById('calc-w').value);
-        const pEl = document.querySelector('.cp-opt.selected');
-        if(!w || !pEl) return;
-
-        const friendCount = parseInt(document.getElementById('calc-f').value);
-        const buffPercent = friendCount * 3;
-        let rm = 1, eb = 0, vs = [];
-        document.querySelectorAll('.cv-opt.selected').forEach(el => {
-            vs.push(el.innerText.trim());
-            el.dataset.t === 'r' ? rm *= parseFloat(el.dataset.v) : eb += parseFloat(el.dataset.v);
-        });
-
-        const res = Math.round(w * parseInt(pEl.dataset.p) * rm * (1 + eb) * (1 + (friendCount * 0.03)));
-        calcHist.push({ n: pEl.innerText, w, vs, v: res, buff: buffPercent });
-        renderCalcHistory();
-
-        document.getElementById('calc-sum').innerText = calcHist.reduce((s, x) => s + x.v, 0).toLocaleString() + ' xu';
-    }
-
-    function clearCalc() {
-        calcHist = [];
-        renderCalcHistory();
-        document.getElementById('calc-sum').innerText = '0 xu';
-    }
-
-    function renderCalcHistory() {
-        document.getElementById('calc-history').innerHTML = calcHist.map((h, index) => `
-            <div style="border-bottom:2px dashed #eee; padding:6px 0; margin-bottom: 4px; line-height: 1.5; display: flex; justify-content: space-between; align-items: center;">
-                <div style="flex: 1; padding-right: 8px;">
-                    ${h.n} (${h.w}kg)${h.vs.length ? ` [${h.vs.map(v => `<span class="${vColors[v]}">${v}</span>`).join(', ')}]` : ''}
-                    ${h.buff > 0 ? `<span style="background: #E8F5E9; color: #2E7D32; padding: 1px 6px; border-radius: 6px; font-size: 11px; font-weight: 800; margin-left: 4px;">+${h.buff}% Bạn bè</span>` : ''}:
-                    <b style="color:var(--primary-nau); font-size: 14px;">${h.v.toLocaleString()} xu</b>
-                </div>
-                <button onclick="deleteCalcItem(${index})" style="background: #FF6B6B; color: white; border: none; border-radius: 6px; width: 24px; height: 24px; font-weight: 900; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 0 #D15252;">×</button>
-            </div>
-        `).join('');
-    }
-
-    function deleteCalcItem(index) {
-        calcHist.splice(index, 1);
-        renderCalcHistory();
-        document.getElementById('calc-sum').innerText = calcHist.reduce((s, x) => s + x.v, 0).toLocaleString() + ' xu';
-    }
-
-    function closeCalcModal() { document.getElementById('modal-calc').style.display = 'none'; }
-    
-    const helpData = {
-        acc: "Đây là nơi quản lý các acc cày nông sản của bạn.<br><br><span style='font-weight:900;color:#8B5E3C;'>• Thêm:</span> Nhập tên acc để tạo mới tài khoản.<br><span style='font-weight:900;color:#8B5E3C;'>• Xóa (×):</span> Hệ thống sẽ xóa sạch toàn bộ nông sản đang lưu thuộc acc này để giải phóng bộ nhớ.<br><span style='font-weight:900;color:#8B5E3C;'>• Sửa:</span> Đổi tên acc mà không làm mất số nông sản đã nhập trước đó.",
-        calc: "Giúp ước tính nhanh giá trị nông sản trước khi thu hoạch:<br><br><span style='font-weight:900;color:#8B5E3C;'>• Biến thể:</span> Chọn các thuộc tính biến thể của nông sản cần cân.<br><span style='font-weight:900;color:#8B5E3C;'>• Nông sản:</span> Chọn loại nông sản cần cân.<br><span style='font-weight:900;color:#8B5E3C;'>• Cân nặng:</span> Nhập số kg của nông sản.<br><span style='font-weight:900;color:#8B5E3C;'>• Bạn bè:</span> Kéo thanh trượt theo số lượng bạn bè trong map (<span style='font-weight:900;color:#4CAF50;'>+3% giá trị</span> trên mỗi người bạn).<br>Bấm <span style='font-weight:900;color:#3B82F6;'>CÂN</span> để lưu kết quả cân vào lịch sử tính toán và cộng dồn vào Tổng giá xu ước tính phía dưới.<br>Bấm <span style='font-weight:900;color:#FF6B6B;'>XÓA</span> để xóa toàn bộ kết quả vừa cân",
-        add: "Nhập thêm nông sản vào kho dữ liệu:<br><br><span style='font-weight:900;color:#8B5E3C;'>• Tài khoản:</span> Chọn chính xác Acc chứa nông sản đó để nhập.<br><span style='font-weight:900;color:#8B5E3C;'>• Cân nặng:</span> Nhập số kg của nông sản.<br><span style='font-weight:900;color:#8B5E3C;'>• Số lượng:</span> Nhập số lượng lớn nông sản (nếu trùng hiệu ứng và số kg).<br><span style='font-weight:900;color:#8B5E3C;'>• Biến thể:</span> Tích chọn các thuộc tính biến thể của nông sản.<br>Nhấn <span style='font-weight:900;color:#3B82F6;'>NHẬP</span> để thêm vào kho",
-        filter: "Công cụ kiểm kho và lọc:<br><br><span style='font-weight:900;color:#8B5E3C;'>• Tài khoản:</span> Lọc theo từng tài khoản (mặc định là tất cả).<br><span style='font-weight:900;color:#8B5E3C;'>• Kiểu lọc:</span> Chọn <span style='font-weight:900;color:#8B5E3C;'>[Chỉ lọc]</span> (tìm nông sản chỉ có duy nhất 1 biến thể đó) hoặc <span style='font-weight:900;color:#8B5E3C;'>[Bao gồm]</span> (tìm tất cả nông sản có chứa biến thể đó)."
-    };
-
-    function showHelp(key) {
-        document.getElementById('help-popup-content').innerHTML = helpData[key] || "Chưa có hướng dẫn cho mục này.";
-        document.getElementById('modal-help-popup').style.display = 'flex';
-    }
-    function closeHelp() {
-        document.getElementById('modal-help-popup').style.display = 'none';
-    }
-
-    // KHÓA CỨNG HÀNH VI CHỐNG PULL-TO-REFRESH BẰNG JS
-    window.addEventListener('load', function() {
-        const scrollableTargets = ['.grid-container', '#sub-list', '#filter-list'];
-        
-        scrollableTargets.forEach(selector => {
-            const el = document.querySelector(selector);
-            if (!el) return;
-
-            let lastY = 0;
-            el.addEventListener('touchstart', (e) => {
-                lastY = e.touches[0].pageY;
-            }, { passive: false });
-
-            el.addEventListener('touchmove', (e) => {
-                const y = e.touches[0].pageY;
-                // Nếu đang ở đỉnh danh sách và vuốt xuống thì chặn cơ chế reload mặc định
-                if (el.scrollTop === 0 && y > lastY) {
-                    e.preventDefault();
-                }
-                lastY = y;
-            }, { passive: false });
-        });
-    });
-
-    renderInv();
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
