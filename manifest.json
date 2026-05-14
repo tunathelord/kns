@@ -1,0 +1,15 @@
+{
+  "name": "Kho Nông Sản PTG",
+  "short_name": "Kho PTG",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#2c2433",
+  "theme_color": "#2c2433",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2329/2329903.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
