@@ -1,6 +1,35 @@
 const vColors = { "Ánh vàng": "c-anh-vang", "Cầu vồng": "c-cau-vong", "Ẩm ướt": "c-am-uot", "Nhiễm điện": "c-nhiem-dien", "Gió": "c-gio", "Khí lạnh": "c-khi-lanh", "Cát": "c-cat", "Ánh trăng": "c-anh-trang", "Băng": "c-bang", "Cực quang": "c-cuc-quang", "Sương": "c-suong", "Khô": "c-kho", "Nguyền rủa": "c-nguyen-rua", "Đèn trời": "c-den-troi", "Ảo ảnh": "c-ao-anh", "Pháo hoa": "c-phao-hoa", "Bướm": "c-buom", "Giai điệu": "c-giai-dieu" };
-    const products = [ {name:"Nhân sâm", p:725000, i:" 🥕 "}, {name:"Bánh bao", p:180000, i:" 🥟 "}, {name:"Cây Đậu", p:12000, i:" 🫘 "}, {name:"Khế", p:10000, i:" ⭐ "}, {name:"Đào giòn", p:8500, i:" 🍑 "}, {name:"Táo đường", p:7600, i:" 🍎 "}, {name:"Dưa hấu", p:5800, i:" 🍉 "}, {name:"Bí ngô", p:5167, i:" 🎃 "}, {name:"Người tuyết", p:4600, i:" ⛄ "}, {name:"Xoài", p:3000, i:" 🥭 "}, {name:"Sầu riêng", p:2500, i:" 🍈 "}, {name:"Xương rồng", p:2300, i:" 🌵 "}, {name:"Táo", p:2200, i:" 🍎 "}, {name:"Nho", p:1050, i:" 🍇 "}, {name:"Dừa", p:1000, i:" 🥥 "}, {name:"Cây tùng", p:300, i:" 🌲 "} ];
-    const variants = [ {n:"Ánh vàng", v:3, t:"r"}, {n:"Cầu vồng", v:2, t:"r"}, {n:"Ẩm ướt", v:0.1, t:"e"}, {n:"Nhiễm điện", v:0.2, t:"e"}, {n:"Gió", v:0.2, t:"e"}, {n:"Khí lạnh", v:0.4, t:"e"}, {n:"Cát", v:0.2, t:"e"}, {n:"Ánh trăng", v:0.4, t:"e"}, {n:"Băng", v:0.3, t:"e"}, {n:"Cực quang", v:0.4, t:"e"}, {n:"Sương", v:0.4, t:"e"}, {n:"Khô", v:0.2, t:"e"}, {n:"Nguyền rủa", v:0.2, t:"e"}, {n:"Đèn trời", v:0.4, t:"e"}, {n:"Ảo ảnh", v:0.3, t:"e"}, {n:"Pháo hoa", v:0.2, t:"e"}, {n:"Bướm", v:0.3, t:"e"}, {n:"Giai điệu", v:0.3, t:"e"} ];
+const products = [
+    { name: "Nhân sâm", p: 725000 },
+    { name: "Bánh bao", p: 180000 },
+    { name: "Cây Đậu", p: 12000 },
+    { name: "Nấm", p: 12000 },
+    { name: "Khế", p: 10000 },
+    { name: "Đào giòn", p: 8500 },
+    { name: "Táo đường", p: 7600 },
+    { name: "Dưa hấu", p: 5800 },
+    { name: "Bí ngô", p: 5167 },
+    { name: "Người tuyết", p: 4600 },
+    { name: "Rau chân vịt", p: 3340 },
+    { name: "Xoài", p: 3000 },
+    { name: "Bắp", p: 2650 },
+    { name: "Sầu riêng", p: 2500 },
+    { name: "Xương rồng", p: 2300 },
+    { name: "Chanh", p: 2200 },
+    { name: "Táo", p: 2200 },
+    { name: "Đu đủ", p: 1900 },
+    { name: "Trái sung", p: 1500 },
+    { name: "Nho", p: 1050 },
+    { name: "Dừa", p: 1000 },
+    { name: "Cà chua", p: 580 },
+    { name: "Mãng cầu", p: 400 },
+    { name: "Rau xà lách", p: 341 },
+    { name: "Cây tùng", p: 300 },
+    { name: "Cà rốt", p: 85 },
+    { name: "Việt quất", p: 25 },
+    { name: "Dâu tây", p: 10 }
+];
+const variants = [ {n:"Ánh vàng", v:3, t:"r"}, {n:"Cầu vồng", v:2, t:"r"}, {n:"Ẩm ướt", v:0.1, t:"e"}, {n:"Nhiễm điện", v:0.2, t:"e"}, {n:"Gió", v:0.2, t:"e"}, {n:"Khí lạnh", v:0.4, t:"e"}, {n:"Cát", v:0.2, t:"e"}, {n:"Ánh trăng", v:0.4, t:"e"}, {n:"Băng", v:0.3, t:"e"}, {n:"Cực quang", v:0.4, t:"e"}, {n:"Sương", v:0.4, t:"e"}, {n:"Khô", v:0.2, t:"e"}, {n:"Nguyền rủa", v:0.2, t:"e"}, {n:"Đèn trời", v:0.4, t:"e"}, {n:"Ảo ảnh", v:0.3, t:"e"}, {n:"Pháo hoa", v:0.2, t:"e"}, {n:"Bướm", v:0.3, t:"e"}, {n:"Giai điệu", v:0.3, t:"e"} ];
     
     let accounts = JSON.parse(localStorage.getItem('tuna_farm_accounts')) || ["Acc_Chính"];
     let inventory = JSON.parse(localStorage.getItem('tuna_farm_data')) || products.map(p => ({...p, items: []}));
